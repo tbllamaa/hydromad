@@ -77,10 +77,12 @@ parameterSets <-
     if (method == "random") {
         par.seqs <- list()
         for (p in names(par.ranges)) {
-            vv <- par.ranges[[p]]
+            vv <- as.numeric(par.ranges[[p]])
             if (free[[p]]) {
                 par.seqs[[p]] <-
                     zapsmall(runif(samples, min = min(vv), max = max(vv)))
+            } else if(length(vv)==1){
+                par.seqs[[p]] <- vv
             } else {
                 par.seqs[[p]] <-
                     sample(vv, samples, replace = TRUE)
