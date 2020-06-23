@@ -57,7 +57,7 @@ data(Cotter)
 ## IHACRES CWI model with exponential unit hydrograph
 ## an unfitted model, with ranges of possible parameter values
 modx <- hydromad(Cotter[1:1000], sma = "cwi", routing = "expuh",
-                 tau_s = c(2,100), v_s = c(0,1))
+                 tau_s = c(2, 100), v_s = c(0, 1))
 modx
 ```
 
