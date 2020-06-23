@@ -36,6 +36,20 @@ Currently you can install the development version from
 devtools::install_github("JosephGuillaume/hydromad")
 ```
 
+## Contributing
+
+The maintainers of Hydromad are always keen to receive contributions.
+However to help us we would like you to consider the following:
+
+  - Please read and use our [CONTRIBUTING
+    document](https://github.com/josephguillaume/hydromad/blob/master/docs/CONTRIBUTING.md),
+    this will really help us integrating your solution into Hydromad.  
+  - This is a list of the \[current issues\] (which you might be able to
+    help with).  
+  - As part of contributing we would like you to consider the ropensci
+    [Code of Conduct](https://ropensci.org/code-of-conduct/), which we
+    use for Hydromad.
+
 ## Usage
 
 This is a basic example which shows you how to solve a common problem:
@@ -66,3 +80,8 @@ modx
 #> tau_s     2   100  
 #> v_s       0     1
 ```
+
+## License
+
+This project is licensed under the terms of the [MIT
+license](https://github.com/josephguillaume/hydromad/blob/master/LICENSE.txt)
