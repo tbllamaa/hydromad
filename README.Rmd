@@ -40,7 +40,7 @@ devtools::install_github("JosephGuillaume/hydromad")
 
 This is a basic example which shows you how to solve a common problem:
 
-```{r example}
+```{r example, message = F}
 library(hydromad)
 ## basic example code
 data(Cotter)
@@ -48,4 +48,5 @@ data(Cotter)
 ## an unfitted model, with ranges of possible parameter values
 modx <- hydromad(Cotter[1:1000], sma = "cwi", routing = "expuh",
                  tau_s = c(2,100), v_s = c(0,1))
+modx
 ```
