@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # hydromad
 
 <!-- badges: start -->
+[![R build status](https://github.com/WillemVervoort/hydromad/workflows/R-CMD-check/badge.svg)](https://github.com/WillemVervoort/hydromad/actions)
 <!-- badges: end -->
 
 The goal of hydromad is to provide a modelling framework for environmental hydrology: water balance accounting and flow routing in spatially aggregated catchments. 
