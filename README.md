@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+<!-- [![R build status](https://github.com/WillemVervoort/hydromad/workflows/R-CMD-check/badge.svg)](https://github.com/WillemVervoort/hydromad/actions) -->
+
 <!-- badges: end -->
 
 The goal of hydromad is to provide a modelling framework for
@@ -74,17 +76,18 @@ devtools::install_github("JosephGuillaume/hydromad")
 
 ## Contributing
 
-The maintainers of Hydromad are always keen to receive contributions.
+The maintainers of hydromad are always keen to receive contributions.
 However to help us we would like you to consider the following:
 
   - Please read and use our [CONTRIBUTING
     document](https://github.com/josephguillaume/hydromad/blob/master/docs/CONTRIBUTING.md),
-    this will really help us integrating your solution into Hydromad.  
-  - This is a list of the \[current issues\] (which you might be able to
-    help with).  
+    this will really help us integrating your solution into hydromad.  
+  - This is a list of the [current
+    issues](https://github.com/josephguillaume/hydromad/issues) (which
+    you might be able to help with).  
   - As part of contributing we would like you to consider the ropensci
     [Code of Conduct](https://ropensci.org/code-of-conduct/), which we
-    use for Hydromad.
+    use for hydromad.
 
 ## Usage
 
