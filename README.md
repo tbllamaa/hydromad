@@ -19,6 +19,10 @@ rainfall; this is then passed through a routing model to estimate
 streamflow. Included are several implementations of common hydrological
 models consistent with this framework.
 
+The main resource for hydromad is the website:
+<http://hydromad.catchment.org> The website describes the different
+functions and gives examples of the code applications
+
 ## Installation
 
 <!--- You can install the released version of hydromad from [CRAN](https://CRAN.R-project.org) with:
@@ -28,7 +32,39 @@ install.packages("hydromad")
 ```
 --->
 
-Currently you can install the development version from
+  - Install required packages from within R:
+
+<!-- end list -->
+
+``` r
+install.packages(c("zoo", "latticeExtra", "polynom", "car", "Hmisc","reshape"))
+```
+
+  - Install hydromad:
+
+<!-- end list -->
+
+``` r
+install.packages("hydromad", repos="http://hydromad.catchment.org")
+```
+
+  - Optionally install other packages required for certain functions:
+
+<!-- end list -->
+
+``` r
+install.packages("DEoptim")
+install.packages("dream", repos="http://hydromad.catchment.org")
+```
+
+Once it is installed, get started with
+
+``` r
+library(package = "hydromad")
+help("hydromad")
+```
+
+The development version can be installed from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -52,7 +88,7 @@ However to help us we would like you to consider the following:
 
 ## Usage
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example of defining a model in hydromad
 
 ``` r
 library(hydromad)
@@ -83,5 +119,5 @@ modx
 
 ## License
 
-This project is licensed under the terms of the [MIT
-license](https://github.com/josephguillaume/hydromad/blob/master/LICENSE.txt)
+This project is licensed under the terms of [GPL
+(\>=2)](https://github.com/josephguillaume/hydromad/blob/master/DESCRIPTION)
