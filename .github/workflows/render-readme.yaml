@@ -16,6 +16,8 @@ jobs:
       - name: Install rmarkdown
         run: Rscript -e 'install.packages("rmarkdown")'
       - name: Install hydromad
+        remotes::install_github("TillF/ppso")
+        remotes::install_url("http://download.r-forge.r-project.org/src/contrib/dream_0.4-2.tar.gz")
         run: Rscript -e 'install.packages("hydromad", repos = "http://hydromad.catchment.org")'
       - name: Render README
         run: Rscript -e 'rmarkdown::render("README.Rmd", output_format = "md_document")'
