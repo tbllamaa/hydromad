@@ -3,7 +3,6 @@
 ## Copyright (c) Felix Andrews <felix@nfrac.org>
 ##
 
-
 plot.hydromad <-
   function(x, y, ...) {
     stop(
@@ -140,5 +139,6 @@ qqmath.hydromad <-
   }
 
 tsdiag.hydromad <- function(object, gof.lag, ...) {
-  stats:::tsdiag.Arima(object$uh, gof.lag = gof.lag, ...)
+  tsdiag.Arima <- getS3method("tsdiag", "Arima")
+  tsdiag.Arima(object$uh, gof.lag = gof.lag, ...)
 }
