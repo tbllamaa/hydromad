@@ -4,10 +4,42 @@
 ##
 
 
+
+
+#' Observed data values
+#'
+#' Like \code{\link{fitted}}, but return the original "observed" data rather
+#' than the modelled data.
+#'
+#' The default method should work for any object with methods for
+#' \code{residuals} and \code{fitted}.
+#'
+#' @importFrom stats arima ts.union fivenum
+#'
+#' @name utilities
+#' @aliases observed observed.default numericSummary
+#' @param object a model object for which to return the observed values.
+#' @param \dots other arguments.
+#' @param x Placeholder
+#' @return the result of \code{fitted(object) + residuals(object)}.
+#' @author Felix Andrews \email{felix@@nfrac.org}
+#' @seealso \code{\link{residuals}}
+#' @keywords ts
+#' @examples
+#'
+#' x <- 1:10
+#' mymodel <- list(fitted.values = x + rnorm(10))
+#' mymodel$residuals <- x - fitted(mymodel)
+#' observed(mymodel)
+#' @rdname utilities
+#' @export
 observed <- function(object, ...) {
   UseMethod("observed")
 }
 
+
+#' @rdname utilities
+#' @export
 observed.default <- function(object, ...) {
   fitted(object, ...) + residuals(object, ...)
 }
@@ -119,6 +151,9 @@ stripWarmup <-
 #    ans <- ts(x, t_warm, t_end, freq)
 # }
 
+
+#' @rdname utilities
+#' @export
 numericSummary <- function(x) {
   x <- as.data.frame(x)
   foo <- sapply(x, function(z) {

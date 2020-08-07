@@ -3,6 +3,7 @@
 ## Copyright (c) Felix Andrews <felix@nfrac.org>
 ##
 
+#' @importFrom stats predict
 
 ## NOTE - currently all the tf() stuff converts data to ts
 
@@ -41,6 +42,8 @@ tf <-
     return(obj)
   }
 
+
+#' @export
 update.tf <-
   function(object, newdata = NULL, pars, ...) {
     upcall <- match.call()
@@ -126,6 +129,8 @@ update.tf <-
     return(object)
   }
 
+
+#' @export
 predict.tf <-
   function(object,
            newdata = NULL,
@@ -146,6 +151,8 @@ predict.tf <-
     )
   }
 
+
+#' @export
 print.tf <-
   function(x, digits = max(3, getOption("digits") - 3), ...) {
     cat("\nUnit Hydrograph / Linear Transfer Function\n")
@@ -166,6 +173,8 @@ print.tf <-
     invisible(x)
   }
 
+
+#' @export
 coef.tf <- function(object, form = c("a,b", "tau,v", "alpha,beta"), ...) {
   coef <- object$coefficients
   if (!missing(form)) {
@@ -175,6 +184,8 @@ coef.tf <- function(object, form = c("a,b", "tau,v", "alpha,beta"), ...) {
   coef
 }
 
+
+#' @export
 xyplot.tf <- function(x, data = NULL, ...) {
   xyplot.hydromad(x, ...)
 }
@@ -200,6 +211,7 @@ normalise.tf <-
     update(object, pars = normalise.tf.coef(coef(object)))
   }
 
+#' @export
 fitted.tf <- function(object, ..., all = FALSE) {
   tmp <- object$fitted.values
   if (length(tmp) == 0) {
@@ -223,6 +235,8 @@ residuals.tf <- function(object, ..., all = FALSE) {
   stripWarmup(tmp, object$warmup)
 }
 
+
+#' @export
 observed.tf <- function(object, ..., all = FALSE) {
   ## observed.default will work, but this may be slightly faster
   tmp <- object$data[, "Q"]
@@ -232,12 +246,18 @@ observed.tf <- function(object, ..., all = FALSE) {
   stripWarmup(tmp, object$warmup)
 }
 
+
+#' @export
 vcov.tf <- function(object, ...) {
   object$cov.mat
 } ## may be NULL
 
+
+
 deviance.tf <- stats:::deviance.lm
 
+
+#' @export
 isValidModel.tf <- function(object, ...) {
   (inherits(object, "tf") &&
     (isTRUE(try(tfParsCheck(coef(object)), silent = TRUE))))

@@ -4,6 +4,71 @@
 ##
 
 
+
+
+#' Estimate transfer function models by Inverse Filtering.
+#'
+#' Calibrate unit hydrograph transfer function models (\code{\link{armax}} or
+#' \code{\link{expuh}}) using Inverse Filtering.
+#'
+#' In normal usage, one would not call these functions directly, but rather
+#' specify the routing fitting method for a \code{\link{hydromad}} model using
+#' that function's \code{rfit} argument. E.g. to specify fitting an
+#' \code{expuh} routing model by inverse filtering one could write
+#'
+#' \code{hydromad(..., routing = "expuh", rfit = "inverse")}
+#'
+#' or
+#'
+#' \code{hydromad(..., routing = "expuh", rfit = list("inverse", order =
+#' c(2,1)))}.
+#'
+#' @importFrom stats as.ts coef runif
+#'
+#' @name armax.inverse.fit
+#' @aliases expuh.inverse.fit
+#' @param DATA a \code{\link{ts}}-like object with named columns: \describe{
+#' \item{list("Q")}{ observed output time series. } \item{list("P")}{ observed
+#' input time series (optional). } }
+#' @param order the transfer function order. See \code{\link{armax}}.
+#' @param delay delay (lag time / dead time) in number of time steps. If
+#' missing, this will be estimated from the cross correlation function.
+#' @param fit.method Placeholder
+#' @param normalise Placeholder
+#' @param init.U Placeholder
+#' @param pars Placeholder
+#' @param use.Qm Placeholder
+#' @param fft.inverse.sim Placeholder
+#' @param rises.only Placeholder
+#' @param max.iterations Placeholder
+#' @param rel.tolerance Placeholder
+#' @param par.epsilon Placeholder
+#' @param init.attempt Placeholder
+#' @param trace Placeholder
+#' @param ... Placeholder
+#' @return a \code{tf} object, which is a list with components
+#' \item{coefficients}{ the fitted parameter values.} \item{fitted.values}{ the
+#' fitted values. } \item{residuals}{ the residuals. } \item{delay}{ the
+#' (possibly fitted) delay time. }
+#' @author Felix Andrews \email{felix@@nfrac.org}
+#' @seealso \code{armax.inverse.sim},
+#' \code{\link{expuh}}, \code{\link{armax.sriv.fit}}
+#' @references ...
+#' @keywords ts
+#' @examples
+#'
+#' U <- ts(c(0, 0, 0, 1, rep(0, 30), 1, rep(0, 20)))
+#' Y <- expuh.sim(lag(U, -1), tau_s = 10, tau_q = 2, v_s = 0.5, v_3 = 0.1)
+#' set.seed(0)
+#' Yh <- Y * rnorm(Y, mean = 1, sd = 0.2)
+#' fit1 <- armax.inverse.fit(ts.union(P = U, Q = Yh),
+#'   order = c(2, 2), warmup = 0
+#' )
+#' fit1
+#' xyplot(ts.union(observed = Yh, fitted = fitted(fit1)),
+#'   superpose = TRUE
+#' )
+#' @export
 armax.inverse.fit <-
   function(DATA,
            order = hydromad.getOption("order"),
@@ -218,6 +283,7 @@ tf.pars.init <-
     if (order["m"] >= 2) {
       v_q <- (1 - v_s - v_3)
     }
+
     lambda <- -runif(1, min = 0, max = 0.9) # -0.01
 
     Q <- coredata(DATA[, "Q"])

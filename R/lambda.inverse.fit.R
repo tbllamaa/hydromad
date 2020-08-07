@@ -4,6 +4,7 @@
 ##
 
 
+#' @export
 lambda.inverse.fit <-
   function(DATA,
            order = c(n = 2, m = 1),

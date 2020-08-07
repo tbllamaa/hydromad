@@ -4,6 +4,8 @@
 ##
 
 ## IHACRES Catchment Wetness Index (CWI) model.
+
+#' @export
 cwi.sim <-
   function(DATA,
            tw, f = 0, scale,
@@ -68,6 +70,8 @@ cwi.ranges <- function() {
   )
 }
 
+#' @importFrom stats coef
+#' @export
 absorbScale.hydromad.cwi <- function(object, gain, ...) {
   parname <- "scale"
   if (gain <= 0) {

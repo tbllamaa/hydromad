@@ -3,6 +3,33 @@
 ## Copyright (c) Felix Andrews <felix@nfrac.org>
 ##
 
+#' Placeholder title for absorbScale
+#'
+#' Description here.
+#'
+#' @importFrom zoo as.zooreg
+#' @importFrom stats predict
+#'
+#' @aliases absorbScale
+#'
+#' @param object Placeholder
+#' @param gain Placeholder
+#' @param ... Placeholder
+
+
+#' @export
+absorbScale <- function(object, gain, ...) {
+  UseMethod("absorbScale")
+}
+
+
+#' @export
+absorbScale.hydromad <- function(object, gain, ...) {
+  return(NULL)
+}
+
+
+#' @export
 update.hydromad <-
   function(object, ..., newdata = NULL, newpars = NULL,
            sma, routing, rfit, warmup,
@@ -295,12 +322,3 @@ update.hydromad <-
 
     return(object)
   }
-
-
-absorbScale <- function(object, gain, ...) {
-  UseMethod("absorbScale")
-}
-
-absorbScale.hydromad <- function(object, gain, ...) {
-  return(NULL)
-}

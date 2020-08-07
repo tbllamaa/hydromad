@@ -5,6 +5,31 @@
 # Chiew et al 2009 WATER RESOURCES RESEARCH, VOL. 45, W10414, doi:10.1029/2008WR007338, 2009
 
 ## SimHyd model
+
+
+#' SimHyd model
+#'
+#' Description here. Requires documentation.
+#'
+#' @aliases simhyd.sim simhyd.ranges simhydrouting.sim simhydrouting.ranges
+#'
+#' @param DATA Placeholder
+#' @param INSC Placeholder
+#' @param COEFF Placeholder
+#' @param SQ Placeholder
+#' @param SMSC Placeholder
+#' @param SUB Placeholder
+#' @param CRAK Placeholder
+#' @param K Placeholder
+#' @param etmult Placeholder
+#' @param GWt0 Placeholder
+#' @param SMSt0 Placeholder
+#' @param return_state Placeholder
+
+#' @useDynLib hydromad _hydromad_simhyd_sim
+#' @useDynLib hydromad
+#' @importFrom Rcpp sourceCpp
+#' @export
 simhyd.sim <-
   function(DATA,
            INSC, COEFF,
@@ -124,6 +149,7 @@ simhyd.sim <-
   }
 
 # Routing based on Muskinghum
+#' @export
 simhydrouting.sim <- function(U, DELAY = 1, X_m = 0.2,
                               epsilon = hydromad.getOption("sim.epsilon"),
                               return_components = FALSE) {
@@ -167,6 +193,7 @@ simhydrouting.sim <- function(U, DELAY = 1, X_m = 0.2,
   X
 }
 
+#' @export
 simhyd.ranges <- function() {
   list(
     INSC = c(0, 50),
@@ -180,6 +207,7 @@ simhyd.ranges <- function() {
   )
 }
 
+#' @export
 simhydrouting.ranges <- function() {
   list(
     DELAY = c(0.1, 5),

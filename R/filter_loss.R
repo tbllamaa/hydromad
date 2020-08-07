@@ -4,7 +4,17 @@
 ##
 
 
-## recursive filter with a constant loss
+#' Recursive filter with a constant loss
+#'
+#' Description
+#'
+#' @param x Placeholder
+#' @param a Placeholder
+#' @param loss Placeholder
+#' @param init Placeholder
+#'
+#' @useDynLib hydromad filter_constloss
+#' @export
 filter_loss <-
   function(x, a, loss, init = 0) {
     stopifnot(is.numeric(x))

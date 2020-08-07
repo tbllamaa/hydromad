@@ -3,6 +3,20 @@
 ## Copyright (c) Felix Andrews <felix@nfrac.org>
 ##
 
+#' tfUtils
+#'
+#' Description here.
+#'
+#' @name tfUtils
+#' @aliases tfParsConvert
+#'
+#'
+#' @param pars Placeholder
+#'
+#' @importFrom stats median
+#' @importFrom utils head
+#' @importFrom polynom poly.calc
+
 
 tfParsCheck <-
   function(pars) {
@@ -42,6 +56,8 @@ tfParsCheck <-
     return(TRUE)
   }
 
+
+#' @export
 tfParsConvert <-
   function(pars, form = c("a,b", "tau,v", "alpha,beta")) {
     form <- match.arg(form)

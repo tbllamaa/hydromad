@@ -1,3 +1,30 @@
+#' Unit Hydrograph using deconvolution
+#'
+#' Estimates the unit hydrograph using deconvolution.
+#'
+#' Estimates the unit hydrograph by fourier transform deconvolution of the
+#' ratio of the cross correlation and auto-correlation functions.
+#'
+#' @importFrom stats ccf na.pass acf dnorm fft
+#' @importFrom graphics plot
+#'
+#' @param P Rainfall or effective rainfall time series
+#' @param Q Flow time series
+#' @param FWHM Full Width Half Maximum to use for Gaussian apodisation function
+#' @param do.plot Whether to plot the unit hydrograph immediately
+#' @return Vector of length \code{(length(P)-1)*2} representing deconvolved
+#' unit hydrograph. Note that entries from \code{length(P)} represent are
+#' obtained by negative lags.  Optionally plot the unit hydrograph.
+#' @author Joseph Guillaume
+#' @seealso \code{\link{expuh},\link{lambda},\link{armax},\link{powuh}}
+#' @references Barry
+#' @keywords ts
+#' @examples
+#'
+#' data(Murrindindi)
+#' h <- deconvolution.uh(Murrindindi$P, Murrindindi$Q, do.plot = TRUE)
+#' head(h)
+#' @export
 deconvolution.uh <- function(P, Q, FWHM = length(P), do.plot = FALSE) {
   ## Calculate PQ and PP cross correlations
   c <- ccf(Q, P, lag.max = length(P), plot = FALSE, na.action = na.pass)

@@ -2,12 +2,49 @@
 ## Copyright (c) 2008 Felix Andrews <felix@nfrac.org>
 ##
 
+
+
+#' Plot the area between two series as a filled polygon.
+#'
+#' Plot the area between two series as a filled polygon.
+#'
+#' none yet.
+#'
+#' @aliases panel.ribbon panel.ribbon.default panel.ribbon.ts panel.ribbon.zoo
+#' @param x,y,y2 data vectors, where y and y2 give lower and upper bounds.  For
+#' the \code{ts} and \code{zoo} methods, \code{y,y2} are time series objects;
+#' if \code{y2} is missing then \code{y} can be a time series with 2 or more
+#' columns.
+#' @param groups a factor defining groups.
+#' @param col,border,lty,lwd,alpha,col.line graphical parameters taken from
+#' \code{trellis.par.get("plot.polygon")} or
+#' \code{trellis.par.get("superpose.polygon")} (when groups defined).
+#' \code{col.line} overrides \code{border}.
+#' @param \dots further arguments passed on to \code{\link{panel.polygon}}.
+#' @param fill ignored; use \code{col} instead.
+#' @param panel.groups used in \code{\link{panel.superpose}}.
+#' @author Felix Andrews \email{felix@@nfrac.org}
+#' @seealso \code{\link{panel.xyplot}}, \code{\link{panel.polygon}}
+#' @keywords dplot
+#' @examples
+#'
+#' xyplot(sunspot.year, aspect = "xy", cut = 3) +
+#'   latticeExtra::layer(panel.ribbon(x, y = y * 0.9, y2 = y * 1.1, ..., col = "grey", under = TRUE))
+#'
+#' ## missing values are handled by splitting the series
+#' tmp <- window(sunspot.year, start = 1900)
+#' tmp[c(1:2, 50:60)] <- NA
+#' xyplot(tmp, panel = panel.ribbon, y2 = 0)
+#' @export
 panel.ribbon <- function(...) {
   UseMethod("panel.ribbon")
 }
 
 ## Plot the area between 2 series as a filled polygon.
 ## With groups, acts like panel.superpose, but with polygon style settings.
+
+#' @rdname panel.ribbon
+#' @export
 panel.ribbon.default <-
   function(x, y, y2, groups = NULL,
            col = if (is.null(groups)) plot.polygon$col else superpose.polygon$col,
@@ -70,6 +107,8 @@ panel.ribbon.default <-
     }
   }
 
+#' @rdname panel.ribbon
+#' @export
 panel.ribbon.ts <- function(y, y2 = NULL, ...) {
   ## allow one 'ts' argument with 2 columns
   if (is.null(y2)) {
@@ -83,6 +122,8 @@ panel.ribbon.ts <- function(y, y2 = NULL, ...) {
   panel.ribbon(x = as.vector(time(y)), y, y2, ...)
 }
 
+#' @rdname panel.ribbon
+#' @export
 panel.ribbon.zoo <- function(y, y2 = NULL, ...) {
   ## allow one 'zoo' argument with 2 columns
   if (is.null(y2)) {

@@ -3,9 +3,10 @@
 ## Copyright (c) Felix Andrews <felix@nfrac.org>
 ##
 
-
 ## TODO: keep attributes of Q
 
+#' @useDynLib hydromad inverse_filter_lambda
+#' @export
 lambda.inverse.sim <-
   function(Q, P = NULL,
            pars = c(tau_s = 0, tau_q = 0, v_s = 1, v_3 = 0),
@@ -161,3 +162,6 @@ lambda.inverse.sim <-
     }
     U
   }
+
+#' @import utils
+utils::globalVariables(c("inverse_filter_lambda"))

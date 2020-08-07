@@ -3,24 +3,74 @@
 ## Copyright (c) Felix Andrews <felix@nfrac.org>
 ##
 
-expuh.inverse.sim <-
-  function(DATA, delay = 0,
-           tau_s = 0, tau_q = 0, tau_3 = 0,
-           v_s = 1, v_q = NA, v_3 = 0,
-           series = 0,
-           Xs_0 = 0, Xq_0 = 0, X3_0 = 0,
-           pars = NULL,
-           ...) {
-    pars0 <- list(
-      tau_s = tau_s, tau_q = tau_q, tau_3 = tau_3,
-      v_s = v_s, v_q = v_q, v_3 = v_3, series = series
-    )
-    pars <- modifyList(pars0, as.list(pars))
-    pars <- tfParsConvert(pars, "a,b")
-    armax.inverse.sim(DATA, pars = pars, ...)
-  }
-
-
+#' Invert transfer function models to estimate input series.
+#'
+#' Invert transfer function models to estimate input series.
+#'
+#' @importFrom stats as.ts is.ts window start end ARMAtoMA
+#' @importFrom utils modifyList
+#' @importFrom latticeExtra simpleSmoothTs
+#' @importFrom zoo na.locf
+#'
+#' @aliases armax.inverse.sim expuh.inverse.sim
+#' @param DATA time-series-like object with columns \code{Q} (streamflow) and
+#' optionally \code{P} (precipitation).
+#' @param delay delay (lag time / dead time) in number of time steps.
+#' @param a_1 Placeholder
+#' @param a_2 Placeholder
+#' @param a_3 Placeholder
+#' @param b_0 Placeholder
+#' @param b_1 Placeholder
+#' @param b_2 Placeholder
+#' @param b_3 Placeholder
+#' @param pars Placeholder
+#' @param init Placeholder
+#' @param rain.factor Placeholder
+#' @param rises.only Placeholder
+#' @param use.Qm Placeholder
+#' @param use.fft.method Placeholder
+#' @param constrain.fft Placeholder
+#' @param mass.balance Placeholder
+#' @param scale.window Placeholder
+#' @author Felix Andrews \email{felix@@nfrac.org}
+#' @seealso \code{\link{armax.inverse.fit}}, \code{\link{armax}},
+#' \code{\link{expuh}}
+#' @references ...
+#' @keywords ts
+#' @examples
+#'
+#' ## baseflow filtering using two-store unit hydrograph
+#' data(Murrindindi)
+#' x <- Murrindindi[1:1000, ]
+#'
+#' ## case 1 (preferred): streamflow + rainfall data constrained
+#' ## such that effective rainfall is less than observed rainfall
+#' foo <- hydromad(x,
+#'   sma = "armax.inverse", routing = "armax",
+#'   rfit = list("inverse", order = c(2, 1))
+#' )
+#' foo
+#' xsq <- predict(foo, return_components = TRUE)
+#' xyplot(cbind(observed = x$Q, slow_component = xsq$Xs), superpose = TRUE)
+#'
+#' ## case 2: using streamflow data only, constrained
+#' ## to have effective rainfall only when flow is rising
+#' foo <- hydromad(x$Q,
+#'   sma = "armax.inverse", routing = "armax",
+#'   rfit = list("inverse", order = c(2, 1), rises.only = TRUE)
+#' )
+#' xsq <- predict(foo, return_components = TRUE)
+#' xyplot(cbind(observed = x$Q, slow_component = xsq$Xs), superpose = TRUE)
+#'
+#' ## case 3: using streamflow data only, unconstrained
+#' foo <- hydromad(x$Q,
+#'   sma = "armax.inverse", routing = "armax",
+#'   rfit = list("inverse", order = c(2, 1))
+#' )
+#' xsq <- predict(foo, return_components = TRUE)
+#' xyplot(cbind(observed = x$Q, slow_component = xsq$Xs), superpose = TRUE)
+#' @useDynLib hydromad inverse_filter
+#' @export
 armax.inverse.sim <-
   function(DATA,
            a_1 = 0, a_2 = 0, a_3 = 0,
@@ -167,6 +217,7 @@ armax.inverse.sim <-
   }
 
 
+
 ## based on http://en.wikipedia.org/w/index.php?title=Wiener_filter&oldid=211541130
 wiener <- function(y, h, N, gamma = 0) {
   length(h) <- length(y)
@@ -190,3 +241,21 @@ wiener <- function(y, h, N, gamma = 0) {
   x <- Re(fft(G * Y, inverse = TRUE) / length(y))
   x
 }
+
+#' @export
+expuh.inverse.sim <-
+  function(DATA, delay = 0,
+           tau_s = 0, tau_q = 0, tau_3 = 0,
+           v_s = 1, v_q = NA, v_3 = 0,
+           series = 0,
+           Xs_0 = 0, Xq_0 = 0, X3_0 = 0,
+           pars = NULL,
+           ...) {
+    pars0 <- list(
+      tau_s = tau_s, tau_q = tau_q, tau_3 = tau_3,
+      v_s = v_s, v_q = v_q, v_3 = v_3, series = series
+    )
+    pars <- modifyList(pars0, as.list(pars))
+    pars <- tfParsConvert(pars, "a,b")
+    armax.inverse.sim(DATA, pars = pars, ...)
+  }

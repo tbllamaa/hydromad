@@ -1,4 +1,15 @@
-
+#' Title placeholder
+#'
+#' Description placeholder.
+#'
+#' @name eval_fdc
+#'
+#' @importFrom stats qnorm pnorm
+#'
+#' @aliases fdc.sample, fdc.allpoints
+#' @param Q Placeholder
+#'
+#' @export
 fdc.sample <- function(Q) {
   if (is.zoo(Q)) Q <- coredata(Q)
   pp <- qnorm(ppoints(NROW(Q)))
@@ -8,6 +19,7 @@ fdc.sample <- function(Q) {
   invisible(fdc.q)
 }
 
+#' @export
 fdc.allpoints <- function(Q) quantile(Q, 1 - ppoints(NROW(Q)))
 
 

@@ -3,6 +3,17 @@
 ## Copyright (c) Felix Andrews <felix@nfrac.org>
 ##
 
+#' Title
+#'
+#' Placeholder description
+#'
+#' @param MODEL Placeholder
+#' @param objective Placeholder
+#' @param P.thresh Placeholder
+#' @param delay Placeholder
+#' @param return_fit Placeholder
+#'
+#' @export
 fitDbmToPeaks <-
   function(MODEL,
            objective = hmadstat("r.sq.sqrt"),

@@ -1,3 +1,8 @@
+#' @importFrom utils write.csv
+#' @importFrom stats aggregate
+#' @importFrom reshape rename
+#'
+#' @export
 paretoTimeAnalysis.data.frame <- function(stat, show.models = NA, objectives = "r.squared",
                                           pars, ...) {
   cat("\nCross-validation Pareto analysis\nWhich models cannot be rejected, due to dataset uncertainty/non-stationarity?\n")
@@ -145,4 +150,5 @@ getDominatedLong <- function(res.dom) {
   resm2
 }
 
+#' @export
 paretoTimeAnalysis.matrix <- paretoTimeAnalysis.data.frame
