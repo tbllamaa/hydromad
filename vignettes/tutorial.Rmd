@@ -403,7 +403,7 @@ c(xyplot(statSeries, type = "s", lwd = 2,
          ylab = "statistic", xlab = NULL),
   `observed streamflow` = xyplot(observed(simAll)),
   layout = c(1,5), x.same = TRUE) +
-    layer_(panel.refline(h = 0, v = time(statSeries)))
+    latticeExtra::layer(panel.refline(h = 0, v = time(statSeries)), under=TRUE)
 ```
 
 *To plot the flow duration curve for modelled vs observed data in the calibration period:*
@@ -629,7 +629,7 @@ something like:
 pqdat$Date <- with(pqdat, as.Date(ISOdate(yr, mon, day)))
 ```
 
-If you have sub-daily time steps, a good choice is to use the `chron()` function from the [chron](https://cran.r-project.org/web/packages/chron/) package to represent the
+If you have sub-daily time steps, a good choice is to use the `chron()` function from the [chron](https://cran.r-project.org/package=chron) package to represent the
 time index.^[There is a time class built into `R`,
   called `POSIXct`, but this represents time zones which can
   sometimes lead to complications.]
@@ -660,7 +660,7 @@ merging, treatment of missing values, rolling averages and other
 functions. While `R` has a built-in structure for regular
 time series (`ts`), these do not handle specific dates or times,
 only index numbers. It is recommended to work with `zoo` objects
-(using the [zoo](https://cran.r-project.org/web/packages/zoo/) package).^[[zoo](https://cran.r-project.org/web/packages/zoo/) objects are a
+(using the [zoo](https://cran.r-project.org/package=zoo) package).^[[zoo](https://cran.r-project.org/package=zoo) objects are a
   generalisation of `ts` objects and in many cases can be used in
   the same way; see `vignette("zoo")`.}
 
