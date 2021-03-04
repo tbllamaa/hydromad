@@ -1,5 +1,8 @@
 # hydromad 0.9-27 (in development)
   * Removed eventsExplorer(), due to dependency on archived playwith
+  * Add HBV model
+  * Update tutorial to Rmarkdown format
+  * Added contributing guidelines
 
 # hydromad 0.9-20
 
