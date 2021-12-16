@@ -1,8 +1,10 @@
-# hydromad 0.9-27 (in development)
-  * Removed eventsExplorer(), due to dependency on archived playwith
-  * Add HBV model
+# hydromad 0.9-27
+  * Add hbv.sim model
+  * Add KGE to hydromad.stats
   * Update tutorial to Rmarkdown format
   * Added contributing guidelines
+  * Removed eventsExplorer(), due to dependency on archived playwith
+  * fix AET values for bucket model #188
 
 # hydromad 0.9-20
 
