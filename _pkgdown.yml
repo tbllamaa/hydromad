@@ -2,14 +2,14 @@ destination: web/docs
 home:
   title: hydromad R package
   links:
-    - text: Report a bug at
-      href: http://github.com/josephguillaume/hydromad/issues'
+    - text: Report a bug
+      href: http://github.com/hydromad/hydromad/issues'
 development:
   mode: devel
 news:
   releases:
     - text: 'hydromad 0.9-26'
-      href: 'http://github.com/josephguillaume/hydromad'
+      href: 'http://github.com/hydromad/hydromad'
 reference:
   - title: 'Modelling framework'
   - contents:
