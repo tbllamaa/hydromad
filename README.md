@@ -6,8 +6,8 @@ hydromad
 <!-- badges: start -->
 
 [![R build
-status](https://github.com/josephguillaume/hydromad/workflows/R-CMD-check/badge.svg)](https://github.com/josephguillaume/hydromad/actions)
-[![codecov](https://codecov.io/gh/josephguillaume/hydromad/branch/master/graph/badge.svg)](https://codecov.io/gh/josephguillaume/hydromad)
+status](https://github.com/hydromad/hydromad/workflows/R-CMD-check/badge.svg)](https://github.com/hydromad/hydromad/actions)
+[![codecov](https://codecov.io/gh/hydromad/hydromad/branch/master/graph/badge.svg)](https://codecov.io/gh/hydromad/hydromad)
 <!-- badges: end -->
 
 The goal of hydromad is to provide a modelling framework for
@@ -23,7 +23,7 @@ streamflow. Included are several implementations of common hydrological
 models consistent with this framework.
 
 The main resource for hydromad is the website:
-<http://hydromad.catchment.org> The website describes the different
+<https://hydromad.github.io> The website describes the different
 functions and gives examples of the code applications.
 
 Installation
@@ -40,7 +40,7 @@ install.packages("hydromad")
 
 <!-- -->
 
-    options(repos=c("http://hydromad.catchment.org",getOption("repos")))
+    options(repos=c("https://hydromad.github.io",getOption("repos")))
 
 -   Install hydromad:
 
@@ -64,7 +64,7 @@ The development version can be installed from
 [GitHub](https://github.com/) with:
 
     # install.packages("devtools")
-    devtools::install_github("JosephGuillaume/hydromad")
+    devtools::install_github("hydromad/hydromad")
 
 Contributing
 ------------
@@ -73,10 +73,10 @@ The maintainers of hydromad are always keen to receive contributions.
 However to help us we would like you to consider the following:
 
 -   Please read and use our [CONTRIBUTING
-    document](https://github.com/josephguillaume/hydromad/blob/master/docs/CONTRIBUTING.md),
+    document](https://github.com/hydromad/hydromad/blob/master/docs/CONTRIBUTING.md),
     this will really help us integrating your solution into hydromad.  
 -   This is a list of the [current
-    issues](https://github.com/josephguillaume/hydromad/issues) (which
+    issues](https://github.com/hydromad/hydromad/issues) (which
     you might be able to help with).  
 -   As part of contributing we would like you to consider the ropensci
     [Code of Conduct](https://ropensci.org/code-of-conduct/), which we
@@ -116,10 +116,10 @@ License
 -------
 
 This project is licensed under the terms of [GPL
-(&gt;=2)](https://github.com/josephguillaume/hydromad/blob/master/DESCRIPTION)
+(&gt;=2)](https://github.com/hydromad/hydromad/blob/master/DESCRIPTION)
 
 Acknowledgements
 ----------------
 
-This research was supported by the Sydney Informatics Hub, a Core
+This package was originally developed at the Australian National University. Research was also supported by the Sydney Informatics Hub, a Core
 Research Facility of the University of Sydney.
