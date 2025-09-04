@@ -7,3 +7,4 @@ tfFit          Simulation study of SRIV transfer function estimator.
 glue           Estimation and visualisation of feasible parameter sets and bounds.
 ET_Calibration Example model calibration of CMD using observed actual ET
 sensitivity    Example of sensitivity analysis of hydromad model using sensitivity package
+gr7jt          Example of running gr7jt model with hydrotestdata and plotting AET/PET vs S/SMSC.
