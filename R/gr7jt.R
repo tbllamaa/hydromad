@@ -224,9 +224,9 @@ gr7jt.sim <-
         
         # warming to check when the ET is getting negative. happens at t=5 for test that we checked..
         # prob not relevant anymore
-        if (t==5) {
-          message(paste('... Warning: ET[t] < 0.01 at t=', t))
-        }
+        #if (t==5) {
+        #  message(paste('... Warning: ET[t] < 0.01 at t=', t))
+        #}
           
         S[t] <- S_prev - ET[t] + Ps    #update the production store
         
