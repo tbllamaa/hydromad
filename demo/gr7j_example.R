@@ -4,9 +4,9 @@
 # load package - not necessary to do each time when working in a project
 library(hydromad)
 
-# Load the new GR4J_rory model. This loads the altered functions into the environment
-# source("GR4J_rory.R")
-# hydromad.model("gr4j_rory", sma = gr4j_rory.sim)
+# Load the new gr7jt model. This loads the altered functions into the environment
+# source("gr7jt.R")
+# hydromad.model("gr7jt", sma = gr7jt.sim)
 
 hydromad.options(pure.R.code = TRUE)  # ensures we use rcode for gr4j, not C
 
@@ -18,7 +18,7 @@ data(HydroTestData)
 # BUILD the model using the hydromad() function; calling the GR4J sma and routing functions
 mod0 <- hydromad(
   HydroTestData, 
-  sma = "gr4j_roryVar", #gr4j_roryVar
+  sma = "gr7jt", #gr7jt
   routing = "gr4jrouting",
   x1 = 100,
   x2 = 20, x3 = 1, x4 = 10,
@@ -108,107 +108,4 @@ ggplot(df_plot, aes(x = S_over_SMSC, y = AET_over_PET, colour = Time)) +
   xlim(0, 1) +
   ylim(0, 1) +
   theme_minimal()
-
-#######Pareto analyis and caliberation for the new model
-
-
-library(hydromad)
-library(readxl)
-
-# Load SAFT drought function
-source("C:/Users/thris/Desktop/FYP-B/saft_drought_algorithm.R", chdir=TRUE)
-
-# Load data
-catchment_data <- read_excel("C:/Users/thris/Desktop/FYP-B/Camels Data Extract.xlsx", sheet = 1)
-rainfall_data <- as.vector(catchment_data$P)
-annual_rainfall <- aggregate(P ~ year, data = catchment_data, sum)
-is_drought <- saft_drought_algorithm(annual_rainfall$P)
-dry_years <- annual_rainfall$year[is_drought]
-nondry_years <- annual_rainfall$year[!is_drought]
-
-# Load full P-E-Q timeseries
-catchment_data_sheet2 <- read_excel("C:/Users/thris/Desktop/FYP-B/Camels Data Extract.xlsx", sheet = 1)
-start_date <- as.Date("1961-01-01")
-date_index <- seq(start_date, by = "day", length.out = nrow(catchment_data_sheet2))
-catchment_zoo <- zoo(catchment_data_sheet2, order.by = date_index)
-
-# Get year from time index
-year <- as.numeric(format(index(catchment_zoo), "%Y"))
-
-# --------- 🔄 MODEL SETUP: USE gr4j_roryVar INSTEAD OF gr4j ----------
-mod <- hydromad(
-  catchment_zoo,
-  sma = "gr4j_roryVar",  # <-- NEW SMA FUNCTION
-  routing = "gr4jrouting",
-  x1 = c(10, 1000), x2 = c(-5, 5), x3 = c(10, 300), x4 = c(1, 4),
-  x5 = c(0.01, 1), x6 = c(0.01, 1), x7 = c(0.01, 1)
-)
-
-# Set DE optimization control
-Nparams <- 7
-paramMult <- 10
-ctrl <- DEoptim::DEoptim.control(NP = Nparams * paramMult)
-
-# --------- Objective Function with Weighted Dry & Non-Dry NSEs ----------
-F = hydromad.stats(
-  'viney' = function(Q, X, dry_years, beta, ...) {
-    Q_dry <- Q[(year %in% dry_years), drop = FALSE]
-    X_dry <- X[(year %in% dry_years), drop = FALSE]
-    Q_nondry <- Q[!(year %in% dry_years), drop = FALSE]
-    X_nondry <- X[!(year %in% dry_years), drop = FALSE]
-    
-    Monthly_NSE_dry <- hmadstat('r.sq.monthly')(Q_dry, X_dry)
-    Monthly_NSE_nondry <- hmadstat('r.sq.monthly')(Q_nondry, X_nondry)
-    
-    NSE_combined <- beta * Monthly_NSE_dry + (1 - beta) * Monthly_NSE_nondry
-    return(NSE_combined)
-  }
-)$viney
-
-# --------- LOOP THROUGH BETA VALUES ----------
-beta_values <- seq(0, 1, by = 0.1)
-fits_list <- list()
-pareto_results <- data.frame(beta = numeric(), nse_dry = numeric(), nse_nondry = numeric(), nse_combined = numeric())
-
-for (beta in beta_values) {
-  cat("Running fit for beta =", beta, "\n")
-  
-  fit <- fitByDE(mod, objective = ~ F(Q, X, dry_years = dry_years, beta = beta))
-  
-  fitted_Q <- fitted(fit)
-  observed_Q <- observed(fit)
-  
-  fitted_dry <- fitted_Q[year %in% dry_years]
-  obs_dry <- observed_Q[year %in% dry_years]
-  
-  fitted_nondry <- fitted_Q[!(year %in% dry_years)]
-  obs_nondry <- observed_Q[!(year %in% dry_years)]
-  
-  nse_dry <- hmadstat('r.sq.monthly')(obs_dry, fitted_dry)
-  nse_nondry <- hmadstat('r.sq.monthly')(obs_nondry, fitted_nondry)
-  nse_combined <- beta * nse_dry + (1 - beta) * nse_nondry
-  
-  pareto_results <- rbind(pareto_results, data.frame(
-    beta = beta,
-    nse_dry = nse_dry,
-    nse_nondry = nse_nondry,
-    nse_combined = nse_combined
-  ))
-  
-  fits_list[[paste0("beta_", beta)]] <- fit
-}
-
-# --------- PLOTTING ---------
-pareto_sorted <- pareto_results[order(pareto_results$nse_dry), ]
-
-plot(pareto_sorted$nse_dry, pareto_sorted$nse_nondry,
-     type = "b", pch = 16,
-     xlab = "Dry Period NSE",
-     ylab = "Non-Dry Period NSE",
-     main = "Pareto Curve — Dry vs Non-Dry Fit (GR4J Rory)")
-
-text(pareto_sorted$nse_dry, pareto_sorted$nse_nondry,
-     labels = round(pareto_sorted$beta, 2),
-     pos = 4, cex = 0.7)
-
 
