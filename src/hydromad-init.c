@@ -12,6 +12,8 @@ extern void inverse_filter_lambda(void *, void *, void *, void *, void *,
                                   void *, void *, void *, void *, void *);
 extern void routing_gr4j(void *, void *, void *, void *, void *, void *, void *,
                          void *, void *);
+extern void routing_gr7jt(void *, void *, void *, void *, void *, void *, void *,
+                         void *, void *);  //change name but same as gr4j
 extern void sma_awbm(void *, void *, void *, void *, void *, void *, void *,
                      void *, void *, void *, void *, void *, void *, void *,
                      void *, void *);
@@ -21,6 +23,8 @@ extern void sma_cmd(void *, void *, void *, void *, void *, void *, void *,
                     void *, void *, void *, void *);
 extern void sma_gr4j(void *, void *, void *, void *, void *, void *, void *,
                      void *);
+extern void sma_gr7jt(void *, void *, void *, void *, void *, void *, void *,
+                      void *, void *, void *, void *);  //added custom sma
 extern void sma_sac(void *, void *, void *, void *, void *, void *, void *,
                     void *, void *, void *, void *, void *, void *, void *);
 extern void sma_sac_state(void *, void *, void *, void *, void *, void *,
@@ -54,10 +58,12 @@ static const R_CMethodDef CEntries[] = {
     {"inverse_filter", (DL_FUNC)&inverse_filter, 9},
     {"inverse_filter_lambda", (DL_FUNC)&inverse_filter_lambda, 10},
     {"routing_gr4j", (DL_FUNC)&routing_gr4j, 9},
+    {"routing_gr7jt", (DL_FUNC)&routing_gr4j, 9},
     {"sma_awbm", (DL_FUNC)&sma_awbm, 16},
     {"sma_bucket", (DL_FUNC)&sma_bucket, 13},
     {"sma_cmd", (DL_FUNC)&sma_cmd, 11},
     {"sma_gr4j", (DL_FUNC)&sma_gr4j, 8},
+    {"sma_gr7jt", (DL_FUNC) &sma_gr7jt, 11},    //added custom sma model
     {"sma_sac", (DL_FUNC)&sma_sac, 14},
     {"sma_sac_state", (DL_FUNC)&sma_sac_state, 32},
     {"sma_snow", (DL_FUNC)&sma_snow, 12},

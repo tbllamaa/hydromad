@@ -147,7 +147,7 @@
 #'
 #' # Parameters in original parameter space
 #' gr4j.transformpar(coef(fit1), back = TRUE)
-#' @useDynLib hydromad sma_gr4j
+#' @useDynLib hydromad sma_gr7jt
 #' @export
 gr7jt.sim <-
   function(DATA,
@@ -180,21 +180,24 @@ gr7jt.sim <-
     COMPILED <- (hydromad.getOption("pure.R.code") == FALSE)
     if (COMPILED) {
         # Note: Original compiled C backend (disabled here to ensure custom ET is used)
-        # ans <- .C(sma_gr4j,
-        #           as.double(P),
-        #           as.double(E),
-        #           as.integer(NROW(DATA)),
-        #           as.double(x1),
-        #           as.double(S_0),
-        #           U = double(NROW(DATA)),
-        #           S = double(NROW(DATA)),
-        #           ET = double(NROW(DATA)),
-        #           NAOK = FALSE, PACKAGE = "hydromad")
-        # U <- ans$U
-        # S <- ans$S
-        # ET <- ans$ET
+        ans <- .C(sma_gr7jt,
+                  as.double(P),
+                  as.double(E),
+                  as.integer(NROW(DATA)),
+                  as.double(x1),
+                  as.double(x5),
+                  as.double(x6),
+                  as.double(x7),
+                  as.double(S_0),
+                  U = double(NROW(DATA)),
+                  S = double(NROW(DATA)),
+                  ET = double(NROW(DATA)),
+                  NAOK = FALSE, PACKAGE = "hydromad")
+        U <- ans$U
+        S <- ans$S
+        ET <- ans$ET
         
-      stop("Compiled GR4J not supported for custom ET equation.")
+      # stop("Compiled GR4J not supported for custom ET equation.") #turned off after implementing c backend
     } else {
       ## implementation in R for cross-checking (slow)
       U <- S <- ET <- P
@@ -261,156 +264,156 @@ gr7jt.ranges <- function() {
 }
 
 
-#' #' @rdname gr7jt
-#' #' @useDynLib hydromad routing_gr4j
-#' #' @export
-#' gr4jrouting.sim <-
-#'   function(U, x2, x3, x4, R_0 = 0, split = 0.9,
-#'            return_components = FALSE,
-#'            epsilon = hydromad.getOption("sim.epsilon"), transformed = FALSE) {
-#'     if (transformed) {
-#'       x2 <- sinh(x2)
-#'       x3 <- exp(x3)
-#'       x4 <- exp(x4) + 0.5
-#'     }
-#'     ## check values
-#'     stopifnot(is.numeric(x2))
-#'     stopifnot(x3 >= 0)
-#'     stopifnot(x4 >= 0.5)
-#'     stopifnot(R_0 >= 0)
-#'     stopifnot(R_0 <= 1)
+#' @rdname gr7jt
+#' @useDynLib hydromad routing_gr7jt
+#' @export
+gr7jtrouting.sim <-
+  function(U, x2, x3, x4, R_0 = 0, split = 0.9,
+           return_components = FALSE,
+           epsilon = hydromad.getOption("sim.epsilon"), transformed = FALSE) {
+    if (transformed) {
+      x2 <- sinh(x2)
+      x3 <- exp(x3)
+      x4 <- exp(x4) + 0.5
+    }
+    ## check values
+    stopifnot(is.numeric(x2))
+    stopifnot(x3 >= 0)
+    stopifnot(x4 >= 0.5)
+    stopifnot(R_0 >= 0)
+    stopifnot(R_0 <= 1)
+
+    inAttr <- attributes(U)
+    U <- as.ts(U)
+
+    n <- ceiling(x4)
+    m <- ceiling(x4 * 2)
+
+    ## S-curves: cumulative proportion of input with time
+    n2 <- floor(x4)
+    SH1 <- pmin((1:n / x4)^(5 / 2), 1)
+    SH2 <- pmin(
+      c(
+        0 + 0.5 * (1:n2 / x4)^(5 / 2),
+        1 - 0.5 * (2 - n:m / x4)^(5 / 2)
+      ),
+      1
+    )
+    SH2[1:m / x4 > 2] <- 1
+    ## unit hydrographs
+    UH1 <- diff(c(0, SH1))
+    UH2 <- diff(c(0, SH2))
+
+    ## skip over missing values (maintaining the state)
+    bad <- is.na(U)
+    U[bad] <- 0
+
+    filter.pad0 <- function(x, f) {
+      y <- x
+      y[] <- filter(c(rep(0, length(f)), x),
+                    filter = f, sides = 1
+      )[-(1:length(f))]
+      y
+    }
+
+    Q9 <- filter.pad0(split * U, UH1)
+    Q1 <- filter.pad0((1 - split) * U, UH2)
+
+    COMPILED <- (hydromad.getOption("pure.R.code") == FALSE)
+    if (COMPILED) {
+      ans <- .C(routing_gr7jt,   #changed name
+                as.double(Q9),
+                as.double(Q1),
+                as.integer(length(U)),
+                as.double(x2),
+                as.double(x3),
+                as.double(R_0),
+                Qr = double(length(U)),
+                Qd = double(length(U)),
+                R = double(length(U)),
+                NAOK = FALSE, PACKAGE = "hydromad"
+      )
+      Qr <- ans$Qr
+      Qd <- ans$Qd
+      R <- ans$R
+    } else {
+      ## implementation in R for cross-checking (slow)
+      Qd <- Qr <- R <- U
+      R_prev <- R_0 * x3
+      for (t in seq(1, length(U))) {
+        Rt_x3 <- R_prev / x3
+        ## groundwater exchange term
+        F <- x2 * Rt_x3^(7 / 2)
+        ## reservoir level
+        R[t] <- max(0, R_prev + Q9[t] + F)
+        ## outflow of reservoir
+        Qr[t] <- R[t] * (1 - (1 + (R[t] / x3)^4)^(-0.25))
+        R[t] <- R[t] - Qr[t]
+        ## other store
+        Qd[t] <- max(0, Q1[t] + F)
+        R_prev <- R[t]
+      }
+    }
+
+    ## zap simulated values smaller than epsilon
+    Qr[Qr < epsilon] <- 0
+    Qd[Qd < epsilon] <- 0
+
+    attributes(Qr) <- attributes(Qd) <- attributes(R) <- inAttr
+
+    ## re-insert missing values
+    Qr[bad] <- NA
+    Qd[bad] <- NA
+
+    if (return_components) {
+      return(cbind(Xr = Qr, Xd = Qd, R = R))
+    } else {
+      return(Qr + Qd)
+    }
+  }
+
+
+gr7jtrouting.ranges <- function() {     #changed name
+  list(
+    x2 = c(-5, 3),
+    x3 = c(20, 300),
+    x4 = c(1.1, 2.9)
+  )
+}
+
+
+
+#' Transform GR4J parameters
 #'
-#'     inAttr <- attributes(U)
-#'     U <- as.ts(U)
-#'
-#'     n <- ceiling(x4)
-#'     m <- ceiling(x4 * 2)
-#'
-#'     ## S-curves: cumulative proportion of input with time
-#'     n2 <- floor(x4)
-#'     SH1 <- pmin((1:n / x4)^(5 / 2), 1)
-#'     SH2 <- pmin(
-#'       c(
-#'         0 + 0.5 * (1:n2 / x4)^(5 / 2),
-#'         1 - 0.5 * (2 - n:m / x4)^(5 / 2)
-#'       ),
-#'       1
-#'     )
-#'     SH2[1:m / x4 > 2] <- 1
-#'     ## unit hydrographs
-#'     UH1 <- diff(c(0, SH1))
-#'     UH2 <- diff(c(0, SH2))
-#'
-#'     ## skip over missing values (maintaining the state)
-#'     bad <- is.na(U)
-#'     U[bad] <- 0
-#'
-#'     filter.pad0 <- function(x, f) {
-#'       y <- x
-#'       y[] <- filter(c(rep(0, length(f)), x),
-#'                     filter = f, sides = 1
-#'       )[-(1:length(f))]
-#'       y
-#'     }
-#'
-#'     Q9 <- filter.pad0(split * U, UH1)
-#'     Q1 <- filter.pad0((1 - split) * U, UH2)
-#'
-#'     COMPILED <- (hydromad.getOption("pure.R.code") == FALSE)
-#'     if (COMPILED) {
-#'       ans <- .C(routing_gr4j,
-#'                 as.double(Q9),
-#'                 as.double(Q1),
-#'                 as.integer(length(U)),
-#'                 as.double(x2),
-#'                 as.double(x3),
-#'                 as.double(R_0),
-#'                 Qr = double(length(U)),
-#'                 Qd = double(length(U)),
-#'                 R = double(length(U)),
-#'                 NAOK = FALSE, PACKAGE = "hydromad"
-#'       )
-#'       Qr <- ans$Qr
-#'       Qd <- ans$Qd
-#'       R <- ans$R
-#'     } else {
-#'       ## implementation in R for cross-checking (slow)
-#'       Qd <- Qr <- R <- U
-#'       R_prev <- R_0 * x3
-#'       for (t in seq(1, length(U))) {
-#'         Rt_x3 <- R_prev / x3
-#'         ## groundwater exchange term
-#'         F <- x2 * Rt_x3^(7 / 2)
-#'         ## reservoir level
-#'         R[t] <- max(0, R_prev + Q9[t] + F)
-#'         ## outflow of reservoir
-#'         Qr[t] <- R[t] * (1 - (1 + (R[t] / x3)^4)^(-0.25))
-#'         R[t] <- R[t] - Qr[t]
-#'         ## other store
-#'         Qd[t] <- max(0, Q1[t] + F)
-#'         R_prev <- R[t]
-#'       }
-#'     }
-#'
-#'     ## zap simulated values smaller than epsilon
-#'     Qr[Qr < epsilon] <- 0
-#'     Qd[Qd < epsilon] <- 0
-#'
-#'     attributes(Qr) <- attributes(Qd) <- attributes(R) <- inAttr
-#'
-#'     ## re-insert missing values
-#'     Qr[bad] <- NA
-#'     Qd[bad] <- NA
-#'
-#'     if (return_components) {
-#'       return(cbind(Xr = Qr, Xd = Qd, R = R))
-#'     } else {
-#'       return(Qr + Qd)
-#'     }
-#'   }
+#' Apply or reverse transformation of GR4J parameters
 #'
 #'
-#' gr4jrouting.ranges <- function() {
-#'   list(
-#'     x2 = c(-5, 3),
-#'     x3 = c(20, 300),
-#'     x4 = c(1.1, 2.9)
-#'   )
-#' }
-#' 
-#' 
-#' 
-#' #' Transform GR4J parameters
-#' #'
-#' #' Apply or reverse transformation of GR4J parameters
-#' #'
-#' #'
-#' #' @param pars named vector or list of parameters, e.g. as provided by
-#' #' \code{coef.hydromad}.
-#' #' @param back Whether to transform or untransform (reverse) the parameters.
-#' #' @return Named list of transformed/untransformed parameters, depending on
-#' #' value of \code{back}.
-#' #' @author Joseph Guillaume
-#' #' @seealso \code{\link{gr4j}}
-#' #' @keywords models
-#' #' @examples
-#' #'
-#' #' gr4j.transformpar(c(hydromad.getOption("gr4j"), hydromad.getOption("gr4jrouting")))
-#' #' gr4j.transformpar(c(x1 = 150, x2 = 2, x3 = 50, x4 = 2), back = FALSE)
-#' #' @export
-#' gr4j.transformpar <- function(pars, back = FALSE) {
-#'   pars <- modifyList(list(x1 = NA, x2 = NA, x3 = NA, x4 = NA), as.list(pars))
-#'   newpars <- pars
-#'   if (back) {
-#'     newpars[["x1"]] <- exp(pars[["x1"]])
-#'     newpars[["x2"]] <- sinh(pars[["x2"]])
-#'     newpars[["x3"]] <- exp(pars[["x3"]])
-#'     newpars[["x4"]] <- exp(pars[["x4"]]) + 0.5
-#'   } else {
-#'     newpars[["x1"]] <- log(pars[["x1"]])
-#'     newpars[["x2"]] <- asinh(pars[["x2"]])
-#'     newpars[["x3"]] <- log(pars[["x3"]])
-#'     newpars[["x4"]] <- log(pars[["x4"]] - 0.5)
-#'   }
-#'   newpars
-#' }
+#' @param pars named vector or list of parameters, e.g. as provided by
+#' \code{coef.hydromad}.
+#' @param back Whether to transform or untransform (reverse) the parameters.
+#' @return Named list of transformed/untransformed parameters, depending on
+#' value of \code{back}.
+#' @author Joseph Guillaume
+#' @seealso \code{\link{gr4j}}
+#' @keywords models
+#' @examples
+#'
+#' gr4j.transformpar(c(hydromad.getOption("gr4j"), hydromad.getOption("gr4jrouting")))
+#' gr4j.transformpar(c(x1 = 150, x2 = 2, x3 = 50, x4 = 2), back = FALSE)
+#' @export
+gr4j.transformpar <- function(pars, back = FALSE) {
+  pars <- modifyList(list(x1 = NA, x2 = NA, x3 = NA, x4 = NA), as.list(pars))
+  newpars <- pars
+  if (back) {
+    newpars[["x1"]] <- exp(pars[["x1"]])
+    newpars[["x2"]] <- sinh(pars[["x2"]])
+    newpars[["x3"]] <- exp(pars[["x3"]])
+    newpars[["x4"]] <- exp(pars[["x4"]]) + 0.5
+  } else {
+    newpars[["x1"]] <- log(pars[["x1"]])
+    newpars[["x2"]] <- asinh(pars[["x2"]])
+    newpars[["x3"]] <- log(pars[["x3"]])
+    newpars[["x4"]] <- log(pars[["x4"]] - 0.5)
+  }
+  newpars
+}
